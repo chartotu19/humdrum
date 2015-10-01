@@ -5,7 +5,7 @@ module.exports = function(grunt){
 			    //context:__dirname+'/src/main/js/',
 			    output: {
 			        path: './public/js/',        
-			        filename: "bundle.js"
+			        filename: "dist.js"
 			    },
 			    module: {
 			        loaders: [

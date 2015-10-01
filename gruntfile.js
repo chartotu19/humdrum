@@ -30,7 +30,7 @@ module.exports = function(grunt) {
   grunt.initConfig(config);
 
   //grunt.registerTask('default', ['clean', 'config', 'sass', 'concat', 'handlebars', 'assemble', 'copy', 'connect', 'watch']);
-  grunt.registerTask('default', ['clean:dev', 'concat','webpack','copy','connect']);
+  grunt.registerTask('default', ['clean:dev','webpack','copy','connect','watch']);
 
 
 };
