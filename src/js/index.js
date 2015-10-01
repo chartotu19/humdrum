@@ -1,5 +1,5 @@
-var app = angular.module('hEngine',['ui.bootstrap']);
-
+var angular = require('angular')
+var app = angular.module('hEngine',[]);
 
 angular.module('hEngine').controller('AccordionDemoCtrl',function($scope) {
 
