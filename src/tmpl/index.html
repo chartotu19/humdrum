@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <link href="" rel="stylesheet"/>
+    <link href="assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <script type="text/javascript" src="assets/angular/angular.js"></script>
+    <script type="text/javascript" src="assets/angular-bootstrap/ui-bootstrap.js"></script>
+  </head>
+  <body ng-app="humdrum">
+    <h6> Humdrum. </h6>
+    <div ng-controller="UserProfileController">
+      <div class="btn btn-primary"  ng-click="fetchuser()"> Fetch </div>
+      <br>
+      <p>{{gh_handle}}</p>
+      <img src="{{pic}}"/>
+
+    </div>
+
+      <script type="text/javascript" src="js/dist.js"></script>
+  </body>
+</html>
