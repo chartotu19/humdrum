@@ -5,7 +5,7 @@ module.exports = function(grunt) {
       'no-write': true
     },
     dev: {
-      src: ["public/**", "!target/assets/"]
+      src: ["./public/**/*","./public/*"]
     }
   }
 };

@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     main: {
       files: [{
         cwd: '',
-        src: 'src/tmpl/index.html',
+        src: 'src/index.html',
         dest: 'public/index.html'
       }]
     }
