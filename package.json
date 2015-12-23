@@ -12,6 +12,7 @@
   },
   "author": "chartotu19",
   "license": "MIT",
+  
   "devDependencies": {
     "glob": "^5.0.14",
     "grunt": "^0.4.5",
@@ -23,10 +24,15 @@
     "load-grunt-tasks": "^3.2.0",
     "grunt-webpack": "^1.0.11",
     "webpack": "^1.12.2",
-    "webpack-dev-server": "^1.12.0",
-    "grunt-contrib-watch": "^0.6.1"
+    "grunt-contrib-watch": "^0.6.1",
+    "babel-loader": "^6.0.1",
+    "babel-preset-react": "^6.3.13",
+    "babel-preset-es2015": "^6.0.12",
+    "babel-preset-stage-0": "^6.3.13"
   },
-  "dependencies": {
-    "angular": "^1.4.7"
+
+  "dependencies": {    
+    "react": "^0.14.3",
+    "react-dom": "^0.14.3"
   }
 }
