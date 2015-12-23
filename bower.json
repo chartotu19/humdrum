@@ -1,10 +1,10 @@
 {
-  "name": "hEngineFE",
+  "name": "humdrum",
   "version": "0.0.1",
   "authors": [
     "Selvam Palanimalai <selvam1991@gmail.com>"
   ],
-  "description": "FE app for hEngine.",
+  "description": "ES6 boilerplate project",
   "license": "MIT",
   "private": true,
   "ignore": [
@@ -16,8 +16,6 @@
     "tests"
   ],
   "dependencies": {
-    "angular-bootstrap": "~0.13.4",
-    "angular": "~1.4.5",
     "bootstrap": "~3.3.5"
   }
 }
