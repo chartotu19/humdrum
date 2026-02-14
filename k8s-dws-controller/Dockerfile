@@ -1,18 +1,14 @@
-FROM golang:1.22 AS builder
-WORKDIR /workspace
+FROM python:3.12-slim AS builder
+WORKDIR /app
 
-COPY go.mod go.mod
-COPY go.sum go.sum
-RUN go mod download
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-COPY cmd/ cmd/
-COPY api/ api/
-COPY internal/ internal/
+FROM python:3.12-slim
+WORKDIR /app
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o manager ./cmd/controller/
+COPY --from=builder /install /usr/local
+COPY src/ src/
 
-FROM gcr.io/distroless/static:nonroot
-WORKDIR /
-COPY --from=builder /workspace/manager .
 USER 65532:65532
-ENTRYPOINT ["/manager"]
+ENTRYPOINT ["python", "-m", "src.main"]

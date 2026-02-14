@@ -1,23 +1,20 @@
 IMG ?= dws-controller:latest
 
-.PHONY: all build run test docker-build docker-push install uninstall deploy undeploy fmt vet
+.PHONY: all run test lint docker-build docker-push install uninstall deploy undeploy
 
-all: build
+all: lint test
 
-fmt:
-	go fmt ./...
+lint:
+	python -m py_compile src/main.py
+	python -m py_compile src/controller.py
+	python -m py_compile src/queue_manager.py
+	python -m py_compile src/models.py
 
-vet: fmt
-	go vet ./...
-
-build: vet
-	go build -o bin/manager ./cmd/controller/
-
-run: vet
-	go run ./cmd/controller/
+run:
+	python -m src.main --dev
 
 test:
-	go test ./... -coverprofile cover.out
+	python -m pytest tests/ -v --tb=short
 
 docker-build:
 	docker build -t $(IMG) .

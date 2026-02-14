@@ -31,27 +31,25 @@ spec:
         - name: manager
           image: dws-controller:latest
           command:
-            - /manager
+            - python
+            - -m
+            - src.main
           args:
-            - --leader-elect
             - --max-concurrent-per-queue=5
           ports:
             - containerPort: 8080
-              name: metrics
-              protocol: TCP
-            - containerPort: 8081
-              name: health
+              name: kopf
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 8081
+              port: 8080
             initialDelaySeconds: 15
             periodSeconds: 20
           readinessProbe:
             httpGet:
-              path: /readyz
-              port: 8081
+              path: /healthz
+              port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
           resources:
@@ -63,7 +61,6 @@ spec:
               memory: 128Mi
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
             runAsNonRoot: true
             capabilities:
               drop:

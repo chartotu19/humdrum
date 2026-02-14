@@ -1,0 +1,13 @@
+[project]
+name = "k8s-dws-controller"
+version = "0.1.0"
+description = "Kubernetes controller for Google DWS job submission and queueing on GKE"
+requires-python = ">=3.11"
+dependencies = [
+    "kopf>=1.37,<2",
+    "kubernetes>=29.0,<31",
+    "pydantic>=2.0,<3",
+]
+
+[project.scripts]
+dws-controller = "src.main:main"
