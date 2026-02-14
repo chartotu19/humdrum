@@ -1,0 +1,194 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dwsjobs.dws.google.com
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+spec:
+  group: dws.google.com
+  names:
+    kind: DWSJob
+    listKind: DWSJobList
+    plural: dwsjobs
+    singular: dwsjob
+    shortNames:
+      - dj
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Mode
+          type: string
+          jsonPath: .spec.mode
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Queue
+          type: string
+          jsonPath: .spec.queueName
+        - name: Priority
+          type: integer
+          jsonPath: .spec.priority
+        - name: Queue Position
+          type: integer
+          jsonPath: .status.queuePosition
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            DWSJob represents a job submission to Google DWS (Dynamic Workload
+            Scheduler) on a GKE node pool, with built-in queueing and lifecycle
+            management.
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              required:
+                - nodePoolName
+                - resources
+                - jobTemplate
+              properties:
+                mode:
+                  type: string
+                  enum: [FlexStart, Calendar]
+                  default: FlexStart
+                  description: >-
+                    DWS scheduling mode. FlexStart uses best-effort dynamic
+                    provisioning with queueing. Calendar uses reserved time
+                    windows with guaranteed capacity.
+                nodePoolName:
+                  type: string
+                  description: Name of the GKE node pool managed by DWS.
+                minNodes:
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  default: 1
+                  description: Minimum number of nodes to provision.
+                maxNodes:
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  description: Maximum number of nodes allowed.
+                priority:
+                  type: integer
+                  format: int32
+                  default: 0
+                  description: >-
+                    Job priority in the queue. Higher values are higher priority.
+                queueName:
+                  type: string
+                  default: default
+                  description: Name of the queue to submit this job to.
+                resources:
+                  type: object
+                  description: Per-node resource requirements.
+                  properties:
+                    gpuType:
+                      type: string
+                      description: "GPU type (e.g., nvidia-tesla-a100, nvidia-h100-80gb)."
+                    gpuCount:
+                      type: integer
+                      format: int32
+                      description: Number of GPUs per node.
+                    tpuTopology:
+                      type: string
+                      description: "TPU topology (e.g., 2x2x2)."
+                    tpuType:
+                      type: string
+                      description: "TPU accelerator type (e.g., tpu-v5-lite-podslice)."
+                    cpu:
+                      anyOf:
+                        - type: integer
+                        - type: string
+                      x-kubernetes-int-or-string: true
+                      description: CPU request per node.
+                    memory:
+                      anyOf:
+                        - type: integer
+                        - type: string
+                      x-kubernetes-int-or-string: true
+                      description: Memory request per node.
+                jobTemplate:
+                  type: object
+                  required:
+                    - template
+                  description: Template for the Kubernetes Job to create.
+                  properties:
+                    parallelism:
+                      type: integer
+                      format: int32
+                    completions:
+                      type: integer
+                      format: int32
+                    template:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                      description: Pod template spec for the job.
+                maxWaitDuration:
+                  type: string
+                  description: "Max time to wait in queue (e.g., 1h, 30m)."
+                startTime:
+                  type: string
+                  format: date-time
+                  description: Requested start time for Calendar mode.
+                endTime:
+                  type: string
+                  format: date-time
+                  description: Requested end time for Calendar mode.
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum: [Pending, Queued, Provisioning, Running, Completed, Failed]
+                queuePosition:
+                  type: integer
+                  format: int32
+                provisioningRequestName:
+                  type: string
+                jobName:
+                  type: string
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                    required:
+                      - type
+                      - status
+                provisionedNodes:
+                  type: array
+                  items:
+                    type: string
+                startTime:
+                  type: string
+                  format: date-time
+                completionTime:
+                  type: string
+                  format: date-time
+                message:
+                  type: string

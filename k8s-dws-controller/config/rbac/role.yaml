@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: dws-controller
+  namespace: dws-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dws-controller-role
+rules:
+  # DWSJob CRUD.
+  - apiGroups: ["dws.google.com"]
+    resources: ["dwsjobs"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["dws.google.com"]
+    resources: ["dwsjobs/status"]
+    verbs: ["get", "update", "patch"]
+  - apiGroups: ["dws.google.com"]
+    resources: ["dwsjobs/finalizers"]
+    verbs: ["update"]
+  # Kubernetes Jobs.
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # ProvisioningRequests for DWS capacity requests.
+  - apiGroups: ["autoscaling.x-k8s.io"]
+    resources: ["provisioningrequests"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # RuntimeClasses (read-only for validation).
+  - apiGroups: ["node.k8s.io"]
+    resources: ["runtimeclasses"]
+    verbs: ["get", "list", "watch"]
+  # Events for recording status changes.
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+  # Coordination for leader election.
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dws-controller-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dws-controller-role
+subjects:
+  - kind: ServiceAccount
+    name: dws-controller
+    namespace: dws-system

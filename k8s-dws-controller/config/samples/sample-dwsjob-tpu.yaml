@@ -1,0 +1,37 @@
+apiVersion: dws.google.com/v1alpha1
+kind: DWSJob
+metadata:
+  name: tpu-training-job
+  namespace: default
+spec:
+  # Calendar mode: reserved capacity with guaranteed time window.
+  mode: Calendar
+  nodePoolName: tpu-v5-pool
+  minNodes: 4
+  priority: 100
+  queueName: reserved
+
+  # Reserved time window.
+  startTime: "2026-03-01T00:00:00Z"
+  endTime: "2026-03-02T00:00:00Z"
+
+  resources:
+    tpuType: tpu-v5-lite-podslice
+    tpuTopology: "2x2x2"
+    cpu: "96"
+    memory: "384Gi"
+
+  jobTemplate:
+    parallelism: 4
+    completions: 4
+    template:
+      spec:
+        restartPolicy: OnFailure
+        containers:
+          - name: tpu-trainer
+            image: us-docker.pkg.dev/my-project/ml/jax-trainer:latest
+            command: ["python"]
+            args: ["train_tpu.py", "--config=configs/large.yaml"]
+            env:
+              - name: TPU_NUM_DEVICES
+                value: "8"

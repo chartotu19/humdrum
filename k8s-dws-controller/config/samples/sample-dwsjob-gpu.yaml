@@ -1,0 +1,68 @@
+apiVersion: dws.google.com/v1alpha1
+kind: DWSJob
+metadata:
+  name: gpu-training-job
+  namespace: default
+spec:
+  # FlexStart mode: best-effort, queued until GPU capacity is available.
+  mode: FlexStart
+  nodePoolName: gpu-pool-a100
+  minNodes: 2
+  maxNodes: 4
+  priority: 10
+  queueName: training
+  maxWaitDuration: "2h"
+
+  resources:
+    gpuType: nvidia-tesla-a100
+    gpuCount: 8
+    cpu: "48"
+    memory: "192Gi"
+
+  jobTemplate:
+    parallelism: 2
+    completions: 2
+    template:
+      spec:
+        restartPolicy: OnFailure
+        containers:
+          - name: trainer
+            image: us-docker.pkg.dev/my-project/ml/trainer:latest
+            command: ["python", "-m", "torch.distributed.launch"]
+            args:
+              - "--nproc_per_node=8"
+              - "train.py"
+              - "--epochs=100"
+              - "--batch-size=256"
+            env:
+              - name: NCCL_DEBUG
+                value: INFO
+---
+apiVersion: dws.google.com/v1alpha1
+kind: DWSJob
+metadata:
+  name: inference-batch
+  namespace: default
+spec:
+  mode: FlexStart
+  nodePoolName: gpu-pool-a100
+  minNodes: 1
+  priority: 5
+  queueName: inference
+
+  resources:
+    gpuType: nvidia-tesla-a100
+    gpuCount: 4
+    cpu: "16"
+    memory: "64Gi"
+
+  jobTemplate:
+    parallelism: 1
+    completions: 1
+    template:
+      spec:
+        restartPolicy: Never
+        containers:
+          - name: inference
+            image: us-docker.pkg.dev/my-project/ml/inference:latest
+            args: ["--model=/models/llm", "--input=/data/prompts.jsonl"]

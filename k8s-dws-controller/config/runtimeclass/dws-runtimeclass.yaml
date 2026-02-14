@@ -1,0 +1,32 @@
+# RuntimeClass for DWS (Dynamic Workload Scheduler) GKE nodepool.
+# Pods referencing this RuntimeClass will be scheduled on DWS-provisioned nodes
+# with the appropriate tolerations and overhead settings.
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: dws-gke
+  labels:
+    app.kubernetes.io/name: dws-controller
+    app.kubernetes.io/component: runtime
+# handler must match the container runtime handler configured on the DWS node pool.
+# "runc" is the default for standard GKE nodes.
+handler: runc
+overhead:
+  podFixed:
+    # Overhead accounts for DWS scheduling agent and monitoring sidecar.
+    cpu: "100m"
+    memory: "128Mi"
+scheduling:
+  # Pods using this RuntimeClass are only scheduled on DWS-managed nodes.
+  nodeSelector:
+    cloud.google.com/gke-provisioning: "dynamic-workload-scheduler"
+  tolerations:
+    # Tolerate the DWS queued-provisioning taint on dynamically provisioned nodes.
+    - key: "cloud.google.com/gke-queued"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+    # Tolerate GPU-specific taints on accelerator nodes.
+    - key: "nvidia.com/gpu"
+      operator: "Exists"
+      effect: "NoSchedule"
